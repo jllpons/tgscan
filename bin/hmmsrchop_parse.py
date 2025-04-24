@@ -35,7 +35,7 @@ from Bio.SearchIO import parse
 from Bio.SearchIO._model import QueryResult
 
 from hmmsrchop_utils import (
-        eprint,
+    eprint,
 )
 
 
@@ -49,13 +49,11 @@ class AlignmentRepresentation:
     sequence: str
     posterior_prob: str
 
-
     def to_json(self) -> Dict[str, Any]:
         """
         Convert the AlignmentRepresentation object to a JSON-compatible dictionary.
         """
         return asdict(self)
-
 
     @classmethod
     def from_json(cls, json_data: Dict[str, Any]) -> "AlignmentRepresentation":
@@ -67,6 +65,7 @@ class AlignmentRepresentation:
 
 @dataclass
 class Alignment:
+    alignment_id: str
     independent_evalue: float
     conditional_evalue: float
     bitscore: float
@@ -83,7 +82,6 @@ class Alignment:
     best_bitscore: bool = False
     best_aln_len: bool = False
 
-
     def to_json(self) -> Dict[str, Any]:
         """
         Convert the Alignment object to a JSON-compatible dictionary.
@@ -92,13 +90,11 @@ class Alignment:
         d["alignment_repr"] = self.alignment_repr.to_json()
         return d
 
-
     @classmethod
-    def from_json(cls, json_data: str) -> "Alignment":
+    def from_json(cls, d: dict) -> "Alignment":
         """
         Create an Alignment object from a JSON-compatible dictionary.
         """
-        d = json.loads(json_data)
         d["alignment_repr"] = AlignmentRepresentation.from_json(d["alignment_repr"])
         return cls(**d)
 
@@ -116,7 +112,6 @@ class ProfileHit:
     best_evalue: bool = False
     best_bitscore: bool = False
 
-
     def flag_best_alignment(self):
         """
         Flag the alignment with the lowest E-value, the highest bit-score
@@ -129,17 +124,23 @@ class ProfileHit:
             raise IndexError(f"No alignments found for hit {self.accession}.")
 
         # E-value
-        best_eval_index = min(range(len(self.alignments)), key=lambda i: self.alignments[i].conditional_evalue)
+        best_eval_index = min(
+            range(len(self.alignments)),
+            key=lambda i: self.alignments[i].conditional_evalue,
+        )
         self.alignments[best_eval_index].best_evalue = True
 
         # Bit score
-        best_bitscore_index = max(range(len(self.alignments)), key=lambda i: self.alignments[i].bitscore)
+        best_bitscore_index = max(
+            range(len(self.alignments)), key=lambda i: self.alignments[i].bitscore
+        )
         self.alignments[best_bitscore_index].best_bitscore = True
 
         # Alignment length
-        best_aln_len_index = max(range(len(self.alignments)), key=lambda i: self.alignments[i].alignment_len)
+        best_aln_len_index = max(
+            range(len(self.alignments)), key=lambda i: self.alignments[i].alignment_len
+        )
         self.alignments[best_aln_len_index].best_aln_len = True
-
 
     def to_json(self) -> Dict[str, Any]:
         """
@@ -149,14 +150,14 @@ class ProfileHit:
         d["alignments"] = [alignment.to_json() for alignment in self.alignments]
         return d
 
-
     @classmethod
-    def from_json(cls, json_data: str) -> "ProfileHit":
+    def from_json(cls, d: dict) -> "ProfileHit":
         """
         Create a Hit object from a JSON-compatible dictionary.
         """
-        d = json.loads(json_data)
-        d["alignments"] = [Alignment.from_json(alignment) for alignment in d.get("alignments", [])]
+        d["alignments"] = [
+            Alignment.from_json(alignment) for alignment in d.get("alignments", [])
+        ]
         return cls(**d)
 
 
@@ -165,12 +166,12 @@ class TargetSequence:
     """
     Stores the results associated with a single target sequence
     """
+
     sequence_id: str
-    #sequence_len: int
+    # sequence_len: int
     hits: List[ProfileHit] = field(default_factory=list)
     significant: bool = False
     schema_version: str = SCHEMA_VERSION
-
 
     def flag_best_hit(self):
         """
@@ -187,9 +188,10 @@ class TargetSequence:
         self.hits[best_eval_index].best_evalue = True
 
         # Bit score
-        best_bitscore_index = max(range(len(self.hits)), key=lambda i: self.hits[i].bitscore)
+        best_bitscore_index = max(
+            range(len(self.hits)), key=lambda i: self.hits[i].bitscore
+        )
         self.hits[best_bitscore_index].best_bitscore = True
-
 
     def to_json_str(self) -> str:
         """
@@ -205,9 +207,9 @@ class TargetSequence:
         Create a TargetSequence object from a JSON-compatible dictionary.
         """
         d = json.loads(json_data)
-        d["hits"] = [ProfileHit.from_json(hit) for hit in d.get("hits", [])]
-        return cls(**d)
-
+        hits_data = d.pop("hits", [])
+        hits = [ProfileHit.from_json(hit_data) for hit_data in hits_data]
+        return cls(hits=hits, **d)
 
     def to_pickle_bytes(self) -> bytes:
         """
@@ -215,13 +217,19 @@ class TargetSequence:
         """
         return pickle.dumps(self)
 
-
     @classmethod
     def from_pickle_bytes(cls, pickle_data: bytes) -> "TargetSequence":
         """
         Create a TargetSequence object from a pickle byte stream.
         """
         return pickle.loads(pickle_data)
+
+
+def id_generator(prefix: str = "DA_") -> Generator[str, None, None]:
+    counter = 1
+    while True:
+        yield f"{prefix}{str(counter)}"
+        counter += 1
 
 
 def setup_argparse() -> argparse.ArgumentParser:
@@ -302,24 +310,29 @@ def parse_hmmsearch_out(hmmsearch_out: str) -> Generator:
     return queryresult_generator
 
 
-def parse_query_results(query_results: Generator) -> List[TargetSequence]:
+def parse_query_results(
+    query_results: Generator,
+    id_generator: Generator[str, None, None] = id_generator(),
+) -> List[TargetSequence]:
     """
     Parse a single query result from the hmmsearch output.
 
     Args:
         query_result (QueryResult): A Bio.SearchIO QueryResult object.
+        id_generator (Generator): A generator for unique IDs.
 
     Returns:
         TargetSequence: A TargetSequence object containing the parsed data.
     """
     sequences = {}
+    alignment_id_generator = id_generator
 
     # The top level object is a QueryResult (from biopython)
     # In the hmmsearch output, it contains information mostly about the profile
     # But we're structuring the data in a sequence-centric way
     for qr in query_results:
         if not qr._items:
-            continue # This profile did not score any significant aligments
+            continue  # This profile did not score any significant aligments
 
         # For the hmmsearch output, a profile scores hits against target sequences
         for hit in qr:
@@ -337,7 +350,9 @@ def parse_query_results(query_results: Generator) -> List[TargetSequence]:
                 sequences[sequence_id].hits.append(
                     ProfileHit(
                         name=qr.id,
-                        accession="" if "accession" not in qr.__dict__ else qr.accession,
+                        accession=""
+                        if "accession" not in qr.__dict__
+                        else qr.accession,
                         description=hit.description,
                         evalue=hit.evalue,
                         bitscore=hit.bitscore,
@@ -349,12 +364,18 @@ def parse_query_results(query_results: Generator) -> List[TargetSequence]:
             for alignment in hit:
                 # Is this possible?
                 if len(alignment._items) > 1:
-                    eprint("Error: More than one alignment found for hit {}.".format(hit.id))
-                    eprint("Turns out we can have more than one alignment fragment for a single alignment.")
+                    eprint(
+                        "Error: More than one alignment found for hit {}.".format(
+                            hit.id
+                        )
+                    )
+                    eprint(
+                        "Turns out we can have more than one alignment fragment for a single alignment."
+                    )
                     sys.exit(1)
 
-
                 alignment = Alignment(
+                    alignment_id=next(alignment_id_generator),
                     independent_evalue=alignment.evalue,
                     conditional_evalue=alignment.evalue_cond,
                     bitscore=alignment.bitscore,
@@ -367,9 +388,11 @@ def parse_query_results(query_results: Generator) -> List[TargetSequence]:
                     alignment_len=len(alignment._items[0].hit),
                     alignment_repr=AlignmentRepresentation(
                         profile_consensus=alignment._items[0].query.seq,
-                        match_annotation=alignment._items[0].aln_annotation['similarity'],
+                        match_annotation=alignment._items[0].aln_annotation[
+                            "similarity"
+                        ],
                         sequence=alignment._items[0].hit.seq,
-                        posterior_prob=alignment._items[0].aln_annotation['PP'],
+                        posterior_prob=alignment._items[0].aln_annotation["PP"],
                     ),
                     significant=hit.is_included,
                 )
@@ -378,7 +401,6 @@ def parse_query_results(query_results: Generator) -> List[TargetSequence]:
                     if h.name == qr.id:
                         h.alignments.append(alignment)
                         break
-
 
     for sequence in sequences.values():
         sequence.flag_best_hit()
@@ -394,7 +416,7 @@ def parse_query_results(query_results: Generator) -> List[TargetSequence]:
 
 def run(args: List[str]) -> None:
     try:
-        config  = setup_config(args)
+        config = setup_config(args)
     except (ValueError, FileNotFoundError):
         sys.exit(1)
     eprint(

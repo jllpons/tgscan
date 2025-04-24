@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Parse and serialize hmmsearch output file and perform different operations
+Parse and serialize hmmsearch output and perform different operations
 
 Usage: hmmsrchop.py <operation> [options]
 
@@ -22,7 +22,6 @@ Options:
     -v, --version   Show version and exit.
 """
 
-
 import sys
 
 
@@ -36,7 +35,6 @@ def main():
         sys.exit(1)
 
     cmd = sys.argv[1]
-
 
     for i in ["-v", "--version"]:
         if i in sys.argv:
@@ -53,7 +51,7 @@ def main():
         run(sys.argv[2:])
 
     elif cmd == "togff":
-        from domtblop_togff import run
+        from hmmsrchop_togff import run
 
         run(sys.argv[2:])
 

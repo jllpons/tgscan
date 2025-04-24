@@ -7,7 +7,9 @@ import sys
 
 from typing import (
     TextIO,
+    Tuple,
 )
+
 
 def eprint(*args, **kwargs) -> None:
     """
@@ -45,3 +47,36 @@ def read_input(file_path: str) -> TextIO:
             raise FileNotFoundError
 
         return open(file_path, "r")
+
+
+def parse_seqkit2translate_fasta_header(header: str) -> Tuple[str, int, int, int]:
+    """
+    Parse the header of a seqkit2 translated FASTA file.
+    The header format is expected to be:
+        [parent_seq]_frame=[frame]_begin=[begin]_end=[end]
+
+    Parameters:
+        header (str): The header string to parse.
+
+    Returns:
+        Tuple[str, int, int, int]: A tuple containing:
+            1. parent_seq (str): The parent sequence identifier.
+            2. frame (int): The frame number.
+            3. begin (int): The beginning position.
+            4. end (int): The ending position.
+
+    Raises:
+        ValueError: If the header format is invalid.
+    """
+    if header.count("=") != 3:
+        eprint(f"Error: Invalid header format: {header}")
+        raise ValueError("Invalid header format")
+
+    parent_seq_str, frame_str, begin_str, end_str = header.split("=")
+
+    parent_seq = parent_seq_str[:-6]
+    frame = int(frame_str[:-6])
+    begin = int(begin_str[:-4])
+    end = int(end_str)
+
+    return parent_seq, frame, begin, end

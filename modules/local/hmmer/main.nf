@@ -13,10 +13,10 @@ process HMMSEARCH {
     tuple val(meta), path(hmmfile), path(seqdb)
 
     output:
-    path 'hmmsearch.out',  emit: hmmsearch_out
-    path 'alignment.sto',    emit: alignment
-    path 'domtblout',        emit: domtblout
-    path 'versions.yml',     emit: versions
+    tuple val(meta), path("hmmsearch.out"), emit: hmmsearch_out
+    path 'alignment.sto',                   emit: alignment
+    path 'domtblout',                       emit: domtblout
+    path 'versions.yml',                    emit: versions
 
     script:
     // <https://www.nextflow.io/docs/latest/script.html#conditional-execution>

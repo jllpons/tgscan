@@ -1,5 +1,7 @@
 include { SEQKIT_TRANSLATE } from '../modules/local/seqkit/main'
 include { HMMSEARCH        } from '../modules/local/hmmer/main'
+include { HMMSRCHOP_PARSE  } from '../modules/local/hmmsrchop/main'
+include { HMMSRCHOP_TOGFF  } from '../modules/local/hmmsrchop/main'
 
 workflow TGSCAN {
 
@@ -31,9 +33,19 @@ workflow TGSCAN {
         ch_hmmfile_fastaTranslated,
     )
 
+    HMMSRCHOP_PARSE(
+        HMMSEARCH.out.hmmsearch_out,
+    )
+
+    HMMSRCHOP_TOGFF(
+        HMMSRCHOP_PARSE.out.hmmsearch_out_json,
+    )
+
     ch_versions = ch_versions.mix(
         SEQKIT_TRANSLATE.out.versions,
         HMMSEARCH.out.versions,
+        HMMSRCHOP_PARSE.out.versions,
+        HMMSRCHOP_TOGFF.out.versions,
     )
 
 

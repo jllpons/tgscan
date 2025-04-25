@@ -51,6 +51,20 @@ Pipeline Parameters:
                           Given value will be passed as '--domZ' argument to hmmsearch.
                           [default: ${params.z_dom_evalue}]
 
+  --togff_mode          : Mode of operation when writing profile alignments coordinates as GFF3.
+                          Options are:
+                            all-alignments   : All alignments from all profiles
+                            best-profile     : All alignments from the best performing profile
+                            best-alignment   : Single best alignment from the best performing profile
+                            best-per-profile : Single best alignment from each profile
+                          [default: ${params.togff_mode}]
+
+  --togff_metric        : Metric to use for selecting the best scoring profile or alignment.
+                          Options are:
+                            bitscore         : Bitscore
+                            evalue           : E-value for profile, conditional E-value for alignment
+                          [default: ${params.togff_metric}]
+
   --help                : Print help message and exit
 
   --version             : Print version and exit
@@ -69,6 +83,8 @@ dom_eval                : ${params.dom_eval}
 dom_bitscore            : ${params.dom_bitscore}
 z_seq_evalue            : ${params.z_seq_evalue}
 z_dom_evalue            : ${params.z_dom_evalue}
+togff_mode              : ${params.togff_mode}
+togff_metric            : ${params.togff_metric}
 
 --
 
@@ -131,9 +147,35 @@ def validateParams() {
         System.exit(1)
     }
 
+    // Check for valid togff_mode and togff_metric values
+    def valid_togff_modes = ['all-alignments', 'best-profile', 'best-alignment', 'best-per-profile']
+    if (!valid_togff_modes.contains(params.togff_mode)) {
+        log.error "Invalid value for --togff_mode: ${params.togff_mode}. Valid options are: {${valid_togff_modes.join(', ')}}"
+        System.exit(1)
+    }
 
+    def valid_togff_metrics = ['bitscore', 'evalue']
+    if (!valid_togff_metrics.contains(params.togff_metric)) {
+        log.error "Invalid value for --togff_metric: ${params.togff_metric}. Valid options are: {${valid_togff_metrics.join(', ')}}"
+        System.exit(1)
+    }
 
+    // Check for valid z_seq_evalue and z_dom_evalue values
+    if (params.z_seq_evalue < 0) {
+        log.error "Invalid value for --z_seq_evalue: ${params.z_seq_evalue}. Must be >= 0"
+        System.exit(1)
+    }
 
+    if (params.z_dom_evalue < 0) {
+        log.error "Invalid value for --z_dom_evalue: ${params.z_dom_evalue}. Must be >= 0"
+        System.exit(1)
+    }
+
+    // Check for valid translate_min_len value
+    if (params.translate_min_len < 0) {
+        log.error "Invalid value for --translate_min_len: ${params.translate_min_len}. Must be >= 0"
+        System.exit(1)
+    }
 }
 
 

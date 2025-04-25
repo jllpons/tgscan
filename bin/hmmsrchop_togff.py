@@ -139,14 +139,19 @@ class GffFeature:
         """ """
         # the translation frame is not necessary as the translation start
         # and end positions are already in the correct frame
-        parent_seq, tr_frame, tr_start, _ = parse_seqkit2translate_fasta_header(
+        parent_seq, tr_frame, tr_start, tr_end = parse_seqkit2translate_fasta_header(
             sequence_id
         )
 
         # WARNING: test the outcome if you touch the following lines
-        alignment_start = tr_start + (profile_alignment.sequence_start * 3)
-        alignment_end = (tr_start + (profile_alignment.sequence_end * 3)) - 1
         alignment_strand = "+" if tr_frame > 0 else "-"
+        match alignment_strand:
+            case "+":
+                alignment_start = tr_start + (profile_alignment.sequence_start * 3)
+                alignment_end = (tr_start + (profile_alignment.sequence_end * 3)) - 1
+            case "-":
+                alignment_start = tr_end - (profile_alignment.sequence_end * 3) + 1
+                alignment_end = (tr_end - (profile_alignment.sequence_start * 3))
 
         return GffFeature(
             feature_id=profile_alignment.alignment_id,
@@ -159,7 +164,8 @@ class GffFeature:
             strand=alignment_strand,
             phase=".",
             attributes={
-                "featureID": profile_alignment.alignment_id,
+                "alignmentID": profile_alignment.alignment_id,
+                "sequenceID": sequence_id,
                 "profileName": profile_name,
                 "conditionalEvalue": str(profile_alignment.conditional_evalue),
                 "independentEvalue": str(profile_alignment.independent_evalue),
@@ -289,9 +295,12 @@ def setup_argparse() -> argparse.ArgumentParser:
     Returns:
     argparse.ArgumentParser: Configured ArgumentParser instance.
     """
+    fmt = lambda prog: argparse.RawTextHelpFormatter(prog)
 
     parser = argparse.ArgumentParser(
         add_help=False,
+        formatter_class=fmt,
+        description=__doc__,
     )
 
     # Required Arguments
@@ -321,7 +330,7 @@ def setup_argparse() -> argparse.ArgumentParser:
     )
 
     # General Options
-    parser.add_argument("-h", "--help", action="store_true", default=False)
+    parser.add_argument("-h", "--help", action="help", default=argparse.SUPPRESS)
 
     return parser
 
@@ -342,10 +351,6 @@ def setup_config(args: List[str]) -> argparse.Namespace:
     if len(sys.argv) == 1 and sys.stdin.isatty():
         print(__doc__)
         sys.exit(1)
-
-    if config.help:
-        print(__doc__)
-        sys.exit(0)
 
     if not config.input:
         eprint("Error: No input file specified.")

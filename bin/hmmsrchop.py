@@ -61,7 +61,7 @@ def main():
         run(sys.argv[2:])
 
     elif cmd == "plot":
-        from domtblop_plot import run
+        from hmmsrchop_plot import run
 
         run(sys.argv[2:])
 

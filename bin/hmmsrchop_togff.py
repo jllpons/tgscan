@@ -151,7 +151,7 @@ class GffFeature:
                 alignment_end = (tr_start + (profile_alignment.sequence_end * 3)) - 1
             case "-":
                 alignment_start = tr_end - (profile_alignment.sequence_end * 3) + 1
-                alignment_end = (tr_end - (profile_alignment.sequence_start * 3))
+                alignment_end = tr_end - (profile_alignment.sequence_start * 3)
 
         return GffFeature(
             feature_id=profile_alignment.alignment_id,
@@ -203,37 +203,40 @@ def gff3_from_target_sequence(
         match mode:
             case GffMode.ALL_ALIGNMENTS:
                 for alignment in profile_hit.alignments:
-                    gff_features.append(
-                        GffFeature.from_profile_alignment(
-                            profile_alignment=alignment,
-                            sequence_id=target_sequence.sequence_id,
-                            profile_name=profile_hit.name,
+                    if alignment.significant:
+                        gff_features.append(
+                            GffFeature.from_profile_alignment(
+                                profile_alignment=alignment,
+                                sequence_id=target_sequence.sequence_id,
+                                profile_name=profile_hit.name,
+                            )
                         )
-                    )
 
             case GffMode.BEST_PROFILE:
                 match metric:
                     case GffMetric.BIT_SCORE:
                         if profile_hit.best_bitscore:
                             for alignment in profile_hit.alignments:
-                                gff_features.append(
-                                    GffFeature.from_profile_alignment(
-                                        profile_alignment=alignment,
-                                        sequence_id=target_sequence.sequence_id,
-                                        profile_name=profile_hit.name,
+                                if alignment.significant:
+                                    gff_features.append(
+                                        GffFeature.from_profile_alignment(
+                                            profile_alignment=alignment,
+                                            sequence_id=target_sequence.sequence_id,
+                                            profile_name=profile_hit.name,
+                                        )
                                     )
-                                )
 
                     case GffMetric.EVALUE:
                         if profile_hit.best_evalue:
                             for alignment in profile_hit.alignments:
-                                gff_features.append(
-                                    GffFeature.from_profile_alignment(
-                                        profile_alignment=alignment,
-                                        sequence_id=target_sequence.sequence_id,
-                                        profile_name=profile_hit.name,
+                                if alignment.significant:
+                                    gff_features.append(
+                                        GffFeature.from_profile_alignment(
+                                            profile_alignment=alignment,
+                                            sequence_id=target_sequence.sequence_id,
+                                            profile_name=profile_hit.name,
+                                        )
                                     )
-                                )
 
             case GffMode.BEST_ALIGNMENT:
                 match metric:
@@ -241,49 +244,53 @@ def gff3_from_target_sequence(
                         if profile_hit.best_bitscore:
                             for alignment in profile_hit.alignments:
                                 if alignment.best_bitscore:
-                                    gff_features.append(
-                                        GffFeature.from_profile_alignment(
-                                            profile_alignment=alignment,
-                                            sequence_id=target_sequence.sequence_id,
-                                            profile_name=profile_hit.name,
+                                    if alignment.significant:
+                                        gff_features.append(
+                                            GffFeature.from_profile_alignment(
+                                                profile_alignment=alignment,
+                                                sequence_id=target_sequence.sequence_id,
+                                                profile_name=profile_hit.name,
+                                            )
                                         )
-                                    )
 
                     case GffMetric.EVALUE:
                         if profile_hit.best_evalue:
                             for alignment in profile_hit.alignments:
                                 if alignment.best_evalue:
-                                    gff_features.append(
-                                        GffFeature.from_profile_alignment(
-                                            profile_alignment=alignment,
-                                            sequence_id=target_sequence.sequence_id,
-                                            profile_name=profile_hit.name,
+                                    if alignment.significant:
+                                        gff_features.append(
+                                            GffFeature.from_profile_alignment(
+                                                profile_alignment=alignment,
+                                                sequence_id=target_sequence.sequence_id,
+                                                profile_name=profile_hit.name,
+                                            )
                                         )
-                                    )
 
             case GffMode.BEST_PER_PROFILE:
                 match metric:
                     case GffMetric.BIT_SCORE:
                         for alignment in profile_hit.alignments:
                             if alignment.best_bitscore:
-                                gff_features.append(
-                                    GffFeature.from_profile_alignment(
-                                        profile_alignment=alignment,
-                                        sequence_id=target_sequence.sequence_id,
-                                        profile_name=profile_hit.name,
+                                if alignment.significant:
+                                    gff_features.append(
+                                        GffFeature.from_profile_alignment(
+                                            profile_alignment=alignment,
+                                            sequence_id=target_sequence.sequence_id,
+                                            profile_name=profile_hit.name,
+                                        )
                                     )
-                                )
 
                     case GffMetric.EVALUE:
                         for alignment in profile_hit.alignments:
                             if alignment.best_evalue:
-                                gff_features.append(
-                                    GffFeature.from_profile_alignment(
-                                        profile_alignment=alignment,
-                                        sequence_id=target_sequence.sequence_id,
-                                        profile_name=profile_hit.name,
+                                if alignment.significant:
+                                    gff_features.append(
+                                        GffFeature.from_profile_alignment(
+                                            profile_alignment=alignment,
+                                            sequence_id=target_sequence.sequence_id,
+                                            profile_name=profile_hit.name,
+                                        )
                                     )
-                                )
 
     return gff_features
 

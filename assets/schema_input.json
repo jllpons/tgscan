@@ -1,0 +1,33 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/nf-core/rnaseq/master/assets/schema_input.json",
+    "title": "tgscan pipeline parameters - params.input input.csv",
+    "description": "IN DEV - Schema for validating gffctx pipeline parameters",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "sample": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "errorMessage": "Sample name must be provided and cannot contain spaces",
+                "meta": ["id"]
+            },
+            "genome": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
+                "errorMessage": "Target genome file, FASTA formmat. Additionally, if the file is compressed, it must end with .gz",
+            },
+            "hmm": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.hmm$",
+                "errorMessage": "File containing the HMM profiles (HMMER format). Multiple profiles can be concatenated in a single file, but the file must be uncompressed and end with .hmm",
+            },
+        },
+        "required": ["sample", "genome", "hmm"],
+    }
+}

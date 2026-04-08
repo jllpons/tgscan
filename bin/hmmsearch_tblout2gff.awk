@@ -1,4 +1,4 @@
-#!/opt/homebrew/bin/gawk -f
+#!/usr/bin/gawk -f
 #
 # Convert hmmersearch --domtblout output to GFF3 format
 #

@@ -2,8 +2,8 @@ process HMMSEARCH {
     tag "$sample_id.id"
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/easel:0.49--h7b50bb2_1' :
-        'quay.io/biocontainers/easel:0.49--hb6cb901_3' }"
+        'https://depot.galaxyproject.org/singularity/hmmer:3.4--h503566f_3' :
+        'quay.io/biocontainers/hmmer:3.4--hb6cb901_4' }"
 
     publishDir "${params.outdir}/${sample_id.id}/hmmsearch", mode: 'copy', overwrite: true, pattern: "hmmsearch.*.{txt,sto,tbl,domtbl}.gz"
 

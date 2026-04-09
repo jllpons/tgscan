@@ -16,9 +16,9 @@ process HMMSEARCH_DOMTBLOUT_TO_GFF {
 
     script:
     """
-    gzip --decompress --stdout ${hmmsearch_domtbl} \\
-        | hmmsearch_tblout2gff.awk - \\
-        | gzip --stdout --name > ${hmmsearch_domtbl.baseName}.gff3.gz
+    gzip -dc ${hmmsearch_domtbl} \
+        | gawk -f hmmsearch_tblout2gff.awk - \
+        | gzip -c > ${hmmsearch_domtbl.baseName}.gff3.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

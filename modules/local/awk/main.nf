@@ -16,9 +16,16 @@ process HMMSEARCH_DOMTBLOUT_TO_GFF {
 
     script:
     """
-    gzip -dc ${hmmsearch_domtbl} \
-        | hmmsearch_tblout2gff.awk - \
-        | gzip -c > ${hmmsearch_domtbl.baseName}.gff3.gz
+    tmp_domtbl_uncompressed="_${hmmsearch_domtbl.baseName}.domtbl"
+    tmp_gff_uncompressed="_${hmmsearch_domtbl.baseName}.gff3"
+
+    gzip -dc ${hmmsearch_domtbl} > \$tmp_domtbl_uncompressed
+
+    hmmsearch_tblout2gff.awk \$tmp_domtbl_uncompressed > \$tmp_gff_uncompressed
+
+    gzip -c \$tmp_gff_uncompressed > ${hmmsearch_domtbl.baseName}.gff3.gz
+
+    rm -f \$tmp_domtbl_uncompressed \$tmp_gff_uncompressed
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

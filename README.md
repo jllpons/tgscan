@@ -98,6 +98,18 @@ tgscan_results/
 | `--help`    | Print help message and exit    |
 | `--version` | Print pipeline version and exit |
 
+## Testing & Playground
+
+If you want to explore or adjust how hits are back-mapped to genomic coordinates and the GFF3 file is generated, the logic lives in a AWK script:
+
+- Script: `bin/hmmsearch_tblout2gff.awk`
+- Test file: `bin/test/test.domtbl`
+
+You can run it directly with gawk to experiment without needing to execute the full pipeline:
+```bash
+gawk -f bin/hmmsearch_tblout2gff.awk bin/test/test.domtbl
+```
+
 ## Dependencies
 
 The pipeline relies on the following tools, which should be available in the execution environment (e.g. via a container or module system):

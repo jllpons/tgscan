@@ -9,6 +9,8 @@
 - [Input](#input)
 - [Output](#output)
 - [Parameters](#parameters)
+- [Testing & Playground](#testing--playground)
+- [Dependencies](#dependencies)
 
 ## Overview
 

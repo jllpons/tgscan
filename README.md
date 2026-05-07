@@ -12,7 +12,7 @@
 
 ## Overview
 
-`tgscan.nf` takes a genome FASTA file and a set of HMM profiles, performs a 6-frame translation of the genome, and runs `hmmsearch` to identify sequences matching the provided profiles.
+`tgscan.nf` takes a genome FASTA file and a set of HMM profiles, performs a 6-frame translation of the genome, and runs `hmmsearch` to identify sequences matching the provided profiles. Finally, the genomic coordinates of all hits meeting the specified score thresholds are back-mapped to the original genome and reported in GFF3 format.
 
 ## Quick Start
 
@@ -50,7 +50,7 @@ All results are written to the directory specified by `--outdir` (default: `tgsc
 tgscan_results/
 └── <sample>/
     ├── hmmsearch/
-    │   ├── hmmsearch.<sample>.domtbl.gff3
+    │   ├── hmmsearch.<sample>.domtbl.gff3.gz
     │   ├── hmmsearch.<sample>.domtbl.gz
     │   ├── hmmsearch.<sample>.sto.gz
     │   ├── hmmsearch.<sample>.tbl.gz

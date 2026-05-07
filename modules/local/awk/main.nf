@@ -4,7 +4,6 @@ process HMMSEARCH_DOMTBLOUT_TO_GFF {
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/gawk:5.3.0' :
         'quay.io/biocontainers/gawk:5.3.0' }"
-    containerOptions "--bind ${projectDir}/bin:/usr/local/bin"
 
     publishDir "${params.outdir}/${sample_id.id}/hmmsearch", mode: 'copy', overwrite: true, pattern: "*.gff3.gz"
 

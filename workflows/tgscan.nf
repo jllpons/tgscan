@@ -29,15 +29,10 @@ workflow TGSCAN {
     )
     ch_versions = ch_versions.mix(TRANSLATE.out.versions)
 
-    ch_hmmserarch_input = TRANSLATE.out.orfs
-        .combine(ch_hmm)
-
-    // Step 2: HMMER search to query the provided HMMs against the translated ORFs
-    HMMSEARCH(
-        ch_hmm,
-        TRANSLATE.out.orfs
-    )
-    ch_versions = ch_versions.mix(HMMSEARCH.out.versions)
+    // Step 2: HMMER search
+    ch_hmmsearch_input = TRANSLATE.out.orfs
+        .join(ch_hmm)  // Results in [meta, orfs, hmm]
+    HMMSEARCH(ch_hmmsearch_input)
 
     // Step 3: Convert HMMER domtblout output to GFF format for downstream analysis
     HMMSEARCH_DOMTBLOUT_TO_GFF(

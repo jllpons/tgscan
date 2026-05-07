@@ -8,8 +8,7 @@ process HMMSEARCH {
     publishDir "${params.outdir}/${sample_id.id}/hmmsearch", mode: 'copy', overwrite: true, pattern: "hmmsearch.*.{txt,sto,tbl,domtbl}.gz"
 
     input:
-    tuple val(sample_id), path(hmm)
-    tuple val(sample_id_b), path(orfs)
+    tuple val(sample_id), path(orfs), path(hmm)  // Single input tuple
 
     output:
     tuple val(sample_id), path("hmmsearch.${sample_id.id}.txt.gz"),     emit: output

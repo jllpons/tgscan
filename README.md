@@ -106,7 +106,7 @@ The pipeline relies on the following tools, which should be available in the exe
 |------|-------------|
 | [HMMER](http://hmmer.org/) | Provides `hmmsearch` for profile-based sequence searching |
 | [Easel miniapplications](http://hmmer.org/) | Utility programs bundled with HMMER. `esl-translate` is used for 6-frame translation of the genome. |
-| [gawk](https://www.gnu.org/software/gawk/) | GNU AWK, used for sequence processing |
+| [gawk](https://www.gnu.org/software/gawk/) | GNU AWK, used for processing `hmmsearch` output and back-mapping coordinates to the genome. |
 
 ---
 

@@ -1,0 +1,11 @@
+#                                                                                  --- full sequence --- -------------- this domain -------------   hmm coord   ali coord   env coord
+# target name        accession   tlen query name           accession         qlen   E-value  score  bias   #  of  c-Evalue  i-Evalue  score  bias  from    to  from    to  from    to  acc description of target
+#------------------- ---------- ----- --------------------       ---------- ----- --------- ------ ----- --- --- --------- --------- ------ ----- ----- ----- ----- ----- ----- ----- ---- ---------------------
+orf1           -             66 Phaeo_conv_LRR       Phaeo_conv_LRR.4    48   2.8e-44  156.8  44.7   1   8   0.00021         1   17.4   0.3     2    41   16   34    16    34 0.90 source=chr_01 coords=1..198 length=66 frame=1 desc=top strand frame 1, expected nt 46..102
+orf2           -             66 Phaeo_conv_LRR       Phaeo_conv_LRR.4    48   2.8e-44  156.8  44.7   1   8   0.00021         1   17.4   0.3     2    41   16   34    16    34 0.90 source=chr_01 coords=2..199 length=66 frame=2 desc=top strand frame 2, expected nt 47..103
+orf3           -             66 Phaeo_conv_LRR       Phaeo_conv_LRR.4    48   2.8e-44  156.8  44.7   1   8   0.00021         1   17.4   0.3     2    41   16   34    16    34 0.90 source=chr_01 coords=3..200 length=66 frame=3 desc=top strand frame 3, expected nt 48..104
+orf4           -             66 Phaeo_conv_LRR       Phaeo_conv_LRR.4    48   2.8e-44  156.8  44.7   1   8   0.00021         1   17.4   0.3     2    41   16   34    16    34 0.90 source=chr_01 coords=600..403 length=66 frame=4 desc=bottom strand frame 4, expected nt 498..555 strand minus
+# End of search results
+# Program:         hmmsearch
+# Version:         3.4 (Aug 2023); http://hmmer.org/
+# Pipeline mode:   SEARCH

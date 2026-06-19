@@ -1,6 +1,6 @@
 include { TRANSLATE                     } from '../modules/local/easel/main.nf'
 include { HMMSEARCH                     } from '../modules/local/hmmer/main.nf'
-include { HMMSEARCH_DOMTBLOUT_TO_GFF    } from '../modules/local/awk/main.nf'
+include { HMMSEARCH_DOMTBLOUT_TO_GFF    } from '../modules/local/python/main.nf'
 
 
 workflow TGSCAN {
